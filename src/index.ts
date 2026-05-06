@@ -140,8 +140,8 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'get_install_status',
-    description: 'Get the status of an asynchronous installation operation using the operation ID from the status URL.',
+    name: 'get_queue_status',
+    description: 'Get the status of an asynchronous operation (installation, uninstallation, etc.) using the operation ID from the status URL.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -368,7 +368,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'get_install_status': {
+      case 'get_queue_status': {
         await ensureAuthenticated();
 
         const { operationId, key } = args as {

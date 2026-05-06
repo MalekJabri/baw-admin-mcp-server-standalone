@@ -52,22 +52,22 @@ async function initializeClient(): Promise<void> {
 // Tool definitions
 const TOOLS: Tool[] = [
   {
-    name: 'baw_login',
-    description: 'Login to IBM Business Automation Workflow and obtain CSRF token for subsequent operations. Must be called before any other BAW operations.',
+    name: 'login',
+    description: 'Login to IBM Business Automation Workflow and obtain CSRF token for subsequent operations. If environment variables are set, those will be used as defaults.',
     inputSchema: {
       type: 'object',
       properties: {
         baseUrl: {
           type: 'string',
-          description: 'Base URL of the BAW server (e.g., https://baw-server.example.com:9443)'
+          description: 'Base URL of the BAW server (e.g., https://baw-server.example.com:9443/bas/ops). Uses BAW_BASE_URL env var if not provided.'
         },
         username: {
           type: 'string',
-          description: 'Username for authentication'
+          description: 'Username for authentication. Uses BAW_USERNAME env var if not provided.'
         },
         password: {
           type: 'string',
-          description: 'Password for authentication'
+          description: 'Password for authentication. Uses BAW_PASSWORD env var if not provided.'
         },
         refreshGroups: {
           type: 'boolean',
@@ -76,15 +76,14 @@ const TOOLS: Tool[] = [
         },
         rejectUnauthorized: {
           type: 'boolean',
-          description: 'Whether to reject unauthorized SSL certificates (default: true)',
+          description: 'Whether to reject unauthorized SSL certificates (default: true). Uses BAW_REJECT_UNAUTHORIZED env var if not provided.',
           default: true
         }
-      },
-      required: ['baseUrl', 'username', 'password']
+      }
     }
   },
   {
-    name: 'baw_install_container',
+    name: 'install_container',
     description: 'Install a process application snapshot to a workflow server. Returns a status URL to monitor the installation progress.',
     inputSchema: {
       type: 'object',
@@ -115,7 +114,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_get_install_status',
+    name: 'get_install_status',
     description: 'Get the status of an asynchronous installation operation using the operation ID from the status URL.',
     inputSchema: {
       type: 'object',
@@ -133,7 +132,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_get_install_messages',
+    name: 'get_install_messages',
     description: 'Get detailed installation messages for a container version to monitor installation progress and identify issues.',
     inputSchema: {
       type: 'object',
@@ -155,7 +154,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_get_version_info',
+    name: 'get_version_info',
     description: 'Get detailed information about a specific container version/snapshot including its state, deployment status, and available actions.',
     inputSchema: {
       type: 'object',
@@ -173,7 +172,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_list_containers',
+    name: 'list_containers',
     description: 'List all process applications and toolkits available in the BAW system.',
     inputSchema: {
       type: 'object',
@@ -190,7 +189,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_activate_version',
+    name: 'activate_version',
     description: 'Activate a container version/snapshot to make it available for use.',
     inputSchema: {
       type: 'object',
@@ -208,7 +207,7 @@ const TOOLS: Tool[] = [
     }
   },
   {
-    name: 'baw_deactivate_version',
+    name: 'deactivate_version',
     description: 'Deactivate a container version/snapshot to prevent new instances from starting.',
     inputSchema: {
       type: 'object',
@@ -261,20 +260,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case 'baw_login': {
+      case 'login': {
         const { baseUrl, username, password, refreshGroups, rejectUnauthorized } = args as {
-          baseUrl: string;
-          username: string;
-          password: string;
+          baseUrl?: string;
+          username?: string;
+          password?: string;
           refreshGroups?: boolean;
           rejectUnauthorized?: boolean;
         };
 
+        // Use environment variables as fallback
+        const finalBaseUrl = baseUrl || process.env.BAW_BASE_URL || process.env.baseUrl;
+        const finalUsername = username || process.env.BAW_USERNAME || process.env.username;
+        const finalPassword = password || process.env.BAW_PASSWORD || process.env.password;
+        const finalRejectUnauthorized = rejectUnauthorized ??
+          (process.env.BAW_REJECT_UNAUTHORIZED === 'false' || process.env.rejectUnauthorized === 'false' ? false : true);
+
+        if (!finalBaseUrl || !finalUsername || !finalPassword) {
+          throw new Error('Missing required credentials. Provide baseUrl, username, and password either as parameters or environment variables.');
+        }
+
         const config: BAWConfig = {
-          baseUrl,
-          username,
-          password,
-          rejectUnauthorized: rejectUnauthorized ?? true
+          baseUrl: finalBaseUrl,
+          username: finalUsername,
+          password: finalPassword,
+          rejectUnauthorized: finalRejectUnauthorized
         };
 
         bawClient = new BAWClient(config);
@@ -295,7 +305,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_install_container': {
+      case 'install_container': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -334,7 +344,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_get_install_status': {
+      case 'get_install_status': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -362,7 +372,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_get_install_messages': {
+      case 'get_install_messages': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -389,7 +399,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_get_version_info': {
+      case 'get_version_info': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -414,7 +424,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_list_containers': {
+      case 'list_containers': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -440,7 +450,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_activate_version': {
+      case 'activate_version': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }
@@ -466,7 +476,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'baw_deactivate_version': {
+      case 'deactivate_version': {
         if (!bawClient) {
           throw new Error('Not authenticated. Please call baw_login first.');
         }

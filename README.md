@@ -118,11 +118,11 @@ When these variables are provided, the server automatically logs in on startup. 
 
 ## Available Tools
 
-### 1. baw_login
+### 1. login
 
-Login to IBM Business Automation Workflow and obtain a CSRF token for subsequent operations.
+Login to IBM Business Automation Workflow and obtain CSRF token for subsequent operations.
 
-**Note:** If you configured environment variables, the server is already authenticated and you don't need to call this tool.
+**Note:** If you configured environment variables, the server is already authenticated and you don't need to call this tool. You can also call this tool without parameters if environment variables are set.
 
 **Parameters:**
 - `baseUrl` (required): Full URL including path to BAW operations API (e.g., `https://baw-server.example.com:9443/bas/ops` or `https://baw-server.example.com:9443/ops`)
@@ -141,7 +141,7 @@ Login to IBM Business Automation Workflow and obtain a CSRF token for subsequent
 }
 ```
 
-### 2. baw_install_container
+### 2. install_container
 
 Install a process application snapshot to a workflow server.
 
@@ -167,7 +167,7 @@ Install a process application snapshot to a workflow server.
 - `operationId`: ID to use with `baw_get_install_status`
 - `key`: Authorization key for status queries
 
-### 3. baw_get_install_status
+### 3. get_install_status
 
 Get the status of an asynchronous installation operation.
 
@@ -189,7 +189,7 @@ Get the status of an asynchronous installation operation.
 - `result`: Result data (if completed)
 - `error`: Error message (if failed)
 
-### 4. baw_get_install_messages
+### 4. get_install_messages
 
 Get detailed installation messages for a container version.
 
@@ -212,7 +212,7 @@ Get detailed installation messages for a container version.
 - Message types: `STEP`, `INFORMATIONAL_MESSAGE`, `WARNING_MESSAGE`, `ERROR_MESSAGE`
 - Message states: `RUNNING`, `COMPLETED_SUCCESSFULLY`, `COMPLETED_IN_ERROR`
 
-### 5. baw_get_version_info
+### 5. get_version_info
 
 Get detailed information about a specific container version/snapshot.
 
@@ -232,7 +232,7 @@ Get detailed information about a specific container version/snapshot.
 - Version details including state, deployment status, and available actions
 - Properties: `is_active`, `is_default`, `is_installed`, `state`, `possible_actions`
 
-### 6. baw_list_containers
+### 6. list_containers
 
 List all process applications and toolkits available in the BAW system.
 
@@ -252,7 +252,7 @@ List all process applications and toolkits available in the BAW system.
 - Array of containers with their details
 - Properties: `container_id`, `container_name`, `container_acronym`, `container_type`
 
-### 7. baw_activate_version
+### 7. activate_version
 
 Activate a container version/snapshot to make it available for use.
 
@@ -268,7 +268,7 @@ Activate a container version/snapshot to make it available for use.
 }
 ```
 
-### 8. baw_deactivate_version
+### 8. deactivate_version
 
 Deactivate a container version/snapshot to prevent new instances from starting.
 

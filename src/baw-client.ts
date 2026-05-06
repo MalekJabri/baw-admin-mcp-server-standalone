@@ -23,6 +23,17 @@ export class BAWClient {
   private config: BAWConfig;
 
   constructor(config: BAWConfig) {
+    // Validate required configuration
+    if (!config.baseUrl) {
+      throw new Error('baseUrl is required in BAW configuration');
+    }
+    if (!config.username) {
+      throw new Error('username is required in BAW configuration');
+    }
+    if (!config.password) {
+      throw new Error('password is required in BAW configuration');
+    }
+
     this.config = config;
     
     // Use baseUrl as-is - it should include the full path (e.g., https://server:9443/bas/ops)

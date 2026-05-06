@@ -323,7 +323,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 success: true,
                 message: 'Successfully logged in to BAW',
                 csrfToken,
-                baseUrl
+                baseUrl: finalBaseUrl
               }, null, 2)
             }
           ]

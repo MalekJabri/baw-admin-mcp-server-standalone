@@ -25,6 +25,14 @@ export interface QueuedOperationStatus {
 }
 
 export interface InstallRequest {
+  install_file: string; // Path to the installation file (.zip or .twx)
+  inactive?: boolean;
+  caseDosName?: string;
+  caseProjectArea?: string;
+  caseOverwrite?: boolean;
+}
+
+export interface SnapshotInstallRequest {
   container: string;
   version: string;
   server: string;

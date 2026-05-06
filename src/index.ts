@@ -109,33 +109,34 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'install_container',
-    description: 'Install a process application snapshot to a workflow server. Returns a status URL to monitor the installation progress.',
+    description: 'Install a process application from a file (.zip for Workflow Server or .twx for Workflow Center). This uploads and installs the application package. Returns a status URL to monitor the installation progress.',
     inputSchema: {
       type: 'object',
       properties: {
-        container: {
+        install_file: {
           type: 'string',
-          description: 'The acronym of the process application'
+          description: 'Path to the installation file (.zip or .twx file)'
         },
-        version: {
-          type: 'string',
-          description: 'The acronym of the snapshot to install'
-        },
-        server: {
-          type: 'string',
-          description: 'The name of the Workflow Server instance'
-        },
-        skipGovernance: {
+        inactive: {
           type: 'boolean',
-          description: 'Skip human approvals in the installation process (default: false)',
+          description: 'Deactivate the snapshot after installation (default: false, ignored in Workflow Center)',
           default: false
+        },
+        caseDosName: {
+          type: 'string',
+          description: 'Name of the case design object store (for case solutions)'
         },
         caseProjectArea: {
           type: 'string',
-          description: 'Project area name for case artifacts (if applicable)'
+          description: 'Target environment or project area for case artifacts'
+        },
+        caseOverwrite: {
+          type: 'boolean',
+          description: 'Overwrite artifacts in the case store if they already exist (default: false)',
+          default: false
         }
       },
-      required: ['container', 'version', 'server']
+      required: ['install_file']
     }
   },
   {
@@ -333,20 +334,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'install_container': {
         await ensureAuthenticated();
 
-        const { container, version, server, skipGovernance, caseProjectArea } = args as {
-          container: string;
-          version: string;
-          server: string;
-          skipGovernance?: boolean;
+        const { install_file, inactive, caseDosName, caseProjectArea, caseOverwrite } = args as {
+          install_file: string;
+          inactive?: boolean;
+          caseDosName?: string;
           caseProjectArea?: string;
+          caseOverwrite?: boolean;
         };
 
         const installRequest: InstallRequest = {
-          container,
-          version,
-          server,
-          skip_governance: skipGovernance,
-          case_project_area: caseProjectArea
+          install_file,
+          inactive,
+          caseDosName,
+          caseProjectArea,
+          caseOverwrite
         };
 
         const result = await bawClient!.installContainer(installRequest);
@@ -357,7 +358,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               type: 'text',
               text: JSON.stringify({
                 success: true,
-                message: 'Installation request submitted',
+                message: 'Installation request submitted. File uploaded and installation started.',
                 statusUrl: result.status_url,
                 key: result.key,
                 operationId: result.status_url.split('/').pop()

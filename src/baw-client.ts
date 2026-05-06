@@ -4,12 +4,15 @@
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import https from 'https';
+import FormData from 'form-data';
+import fs from 'fs';
 import type {
   BAWConfig,
   CSRFToken,
   LoginRequest,
   QueuedOperationStatus,
   InstallRequest,
+  SnapshotInstallRequest,
   RequestAcceptedResult,
   InstallMessagesResult,
   Version,
@@ -144,9 +147,50 @@ export class BAWClient {
   }
 
   /**
-   * Install a process application snapshot to a workflow server
+   * Install a process application from a file (.zip or .twx)
    */
   async installContainer(request: InstallRequest): Promise<RequestAcceptedResult> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const { install_file, inactive, caseDosName, caseProjectArea, caseOverwrite } = request;
+
+    // Check if file exists
+    if (!fs.existsSync(install_file)) {
+      throw new Error(`Installation file not found: ${install_file}`);
+    }
+
+    // Create form data
+    const formData = new FormData();
+    formData.append('install_file', fs.createReadStream(install_file));
+
+    // Build query parameters
+    const params: any = {};
+    if (inactive !== undefined) params.inactive = inactive;
+    if (caseDosName) params.caseDosName = caseDosName;
+    if (caseProjectArea) params.caseProjectArea = caseProjectArea;
+    if (caseOverwrite !== undefined) params.caseOverwrite = caseOverwrite;
+
+    const response = await this.axiosInstance.post<RequestAcceptedResult>(
+      `/std/bpm/containers/install`,
+      formData,
+      {
+        params,
+        headers: {
+          ...formData.getHeaders(),
+          'BPMCSRFToken': this.csrfToken
+        }
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Install a process application snapshot to a workflow server (from Workflow Center)
+   */
+  async installSnapshot(request: SnapshotInstallRequest): Promise<RequestAcceptedResult> {
     if (!this.isAuthenticated()) {
       throw new Error('Not authenticated. Please login first.');
     }

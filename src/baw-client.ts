@@ -25,8 +25,9 @@ export class BAWClient {
   constructor(config: BAWConfig) {
     this.config = config;
     
+    // Use baseUrl as-is - it should include the full path (e.g., https://server:9443/bas/ops)
     const axiosConfig: any = {
-      baseURL: `${config.baseUrl}/bas/ops`,
+      baseURL: config.baseUrl,
       auth: {
         username: config.username,
         password: config.password

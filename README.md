@@ -109,7 +109,7 @@ Then use the `baw_login` tool to authenticate manually.
 
 The server supports automatic authentication using environment variables:
 
-- `BAW_BASE_URL` or `baseUrl`: Base URL of the BAW server
+- `BAW_BASE_URL` or `baseUrl`: Full URL including path to BAW operations API (e.g., `https://server:9443/bas/ops` or `https://server:9443/ops` depending on your deployment)
 - `BAW_USERNAME` or `username`: Username for authentication
 - `BAW_PASSWORD` or `password`: Password for authentication
 - `BAW_REJECT_UNAUTHORIZED` or `rejectUnauthorized`: SSL certificate validation (default: "true")
@@ -125,7 +125,7 @@ Login to IBM Business Automation Workflow and obtain a CSRF token for subsequent
 **Note:** If you configured environment variables, the server is already authenticated and you don't need to call this tool.
 
 **Parameters:**
-- `baseUrl` (required): Base URL of the BAW server (e.g., `https://baw-server.example.com:9443`)
+- `baseUrl` (required): Full URL including path to BAW operations API (e.g., `https://baw-server.example.com:9443/bas/ops` or `https://baw-server.example.com:9443/ops`)
 - `username` (required): Username for authentication
 - `password` (required): Password for authentication
 - `refreshGroups` (optional): Whether to refresh group membership information (default: false)
@@ -134,7 +134,7 @@ Login to IBM Business Automation Workflow and obtain a CSRF token for subsequent
 **Example:**
 ```json
 {
-  "baseUrl": "https://baw-server.example.com:9443",
+  "baseUrl": "https://baw-server.example.com:9443/bas/ops",
   "username": "admin",
   "password": "password",
   "rejectUnauthorized": false

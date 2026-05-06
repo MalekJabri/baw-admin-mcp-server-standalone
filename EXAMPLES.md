@@ -10,7 +10,7 @@ This document provides practical examples of using the BAW Operations MCP Server
 {
   "tool": "baw_login",
   "arguments": {
-    "baseUrl": "https://baw-server.example.com:9443",
+    "baseUrl": "https://baw-server.example.com:9443/bas/ops",
     "username": "admin",
     "password": "your-password",
     "rejectUnauthorized": false
@@ -393,7 +393,7 @@ Here's a typical polling pattern to monitor installation:
 {
   "tool": "baw_login",
   "arguments": {
-    "baseUrl": "https://baw-prod.example.com:9443",
+    "baseUrl": "https://baw-prod.example.com:9443/bas/ops",
     "username": "prod-admin",
     "password": "secure-password",
     "rejectUnauthorized": true

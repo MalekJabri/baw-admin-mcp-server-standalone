@@ -19,7 +19,7 @@ Add this configuration to your MCP client's config file:
         "baw-admin-mcp-server"
       ],
       "env": {
-        "BAW_BASE_URL": "https://your-baw-server.com:9443",
+        "BAW_BASE_URL": "https://your-baw-server.com:9443/bas/ops",
         "BAW_USERNAME": "your_username",
         "BAW_PASSWORD": "your_password",
         "BAW_REJECT_UNAUTHORIZED": "false"
@@ -60,7 +60,7 @@ Otherwise, use the `baw_login` tool with your BAW credentials:
 
 ```json
 {
-  "baseUrl": "https://your-baw-server.com:9443",
+  "baseUrl": "https://your-baw-server.com:9443/bas/ops",
   "username": "your-username",
   "password": "your-password",
   "rejectUnauthorized": false

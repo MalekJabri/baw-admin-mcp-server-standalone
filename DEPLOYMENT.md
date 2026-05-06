@@ -54,7 +54,7 @@ Edit your `claude_desktop_config.json`:
         "baw-admin-mcp-server"
       ],
       "env": {
-        "BAW_BASE_URL": "https://your-baw-server.com:9443",
+        "BAW_BASE_URL": "https://your-baw-server.com:9443/bas/ops",
         "BAW_USERNAME": "your_username",
         "BAW_PASSWORD": "your_password",
         "BAW_REJECT_UNAUTHORIZED": "false"

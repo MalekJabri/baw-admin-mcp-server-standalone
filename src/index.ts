@@ -361,7 +361,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 message: 'Installation request submitted. File uploaded and installation started.',
                 statusUrl: result.status_url,
                 key: result.key,
-                operationId: result.status_url.split('/').pop()
+                operationId: result.status_url ? result.status_url.split('/').pop() : undefined
               }, null, 2)
             }
           ]

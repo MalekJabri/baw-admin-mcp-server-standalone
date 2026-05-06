@@ -34,11 +34,20 @@ export class BAWClient {
       throw new Error('password is required in BAW configuration');
     }
 
-    this.config = config;
+    // Ensure baseUrl is a string
+    const baseUrl = String(config.baseUrl).trim();
+    if (!baseUrl) {
+      throw new Error('baseUrl cannot be empty');
+    }
+
+    this.config = {
+      ...config,
+      baseUrl
+    };
     
     // Use baseUrl as-is - it should include the full path (e.g., https://server:9443/bas/ops)
     const axiosConfig: any = {
-      baseURL: config.baseUrl,
+      baseURL: baseUrl,
       auth: {
         username: config.username,
         password: config.password

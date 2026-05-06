@@ -3,7 +3,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { HttpsProxyAgent } from 'https-proxy-agent';
+import https from 'https';
 import type {
   BAWConfig,
   CSRFToken,
@@ -51,9 +51,9 @@ export class BAWClient {
 
     // Handle SSL certificate validation
     if (config.rejectUnauthorized === false) {
-      axiosConfig.httpsAgent = new HttpsProxyAgent({
+      axiosConfig.httpsAgent = new https.Agent({
         rejectUnauthorized: false
-      } as any);
+      });
     }
 
     this.axiosInstance = axios.create(axiosConfig);

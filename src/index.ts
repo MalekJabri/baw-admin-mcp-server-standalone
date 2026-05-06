@@ -43,8 +43,33 @@ async function initializeClient(): Promise<void> {
       console.error('Auto-login successful using environment variables');
     } catch (error) {
       console.error('Auto-login failed:', error instanceof Error ? error.message : String(error));
-      console.error('You can still use baw_login tool to authenticate manually');
+      console.error('You can still use login tool to authenticate manually');
       bawClient = null;
+    }
+  }
+}
+
+// Ensure client is initialized, using env vars if available
+async function ensureAuthenticated(): Promise<void> {
+  if (!bawClient) {
+    // Try to initialize from environment variables
+    const baseUrl = process.env.BAW_BASE_URL || process.env.baseUrl;
+    const username = process.env.BAW_USERNAME || process.env.username;
+    const password = process.env.BAW_PASSWORD || process.env.password;
+    const rejectUnauthorized = process.env.BAW_REJECT_UNAUTHORIZED || process.env.rejectUnauthorized;
+
+    if (baseUrl && username && password) {
+      const config: BAWConfig = {
+        baseUrl,
+        username,
+        password,
+        rejectUnauthorized: rejectUnauthorized === 'false' ? false : true
+      };
+
+      bawClient = new BAWClient(config);
+      await bawClient.login(false);
+    } else {
+      throw new Error('Not authenticated. Please call login tool first or set environment variables (BAW_BASE_URL, BAW_USERNAME, BAW_PASSWORD).');
     }
   }
 }
@@ -306,9 +331,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'install_container': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { container, version, server, skipGovernance, caseProjectArea } = args as {
           container: string;
@@ -326,7 +349,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           case_project_area: caseProjectArea
         };
 
-        const result = await bawClient.installContainer(installRequest);
+        const result = await bawClient!.installContainer(installRequest);
 
         return {
           content: [
@@ -345,16 +368,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'get_install_status': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { operationId, key } = args as {
           operationId: string;
           key?: string;
         };
 
-        const status = await bawClient.getQueueStatus(operationId, key);
+        const status = await bawClient!.getQueueStatus(operationId, key);
 
         return {
           content: [
@@ -373,9 +394,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'get_install_messages': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { container, version, server } = args as {
           container: string;
@@ -383,7 +402,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           server?: string;
         };
 
-        const messages = await bawClient.getInstallMessages(container, version, server);
+        const messages = await bawClient!.getInstallMessages(container, version, server);
 
         return {
           content: [
@@ -400,16 +419,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'get_version_info': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { container, version } = args as {
           container: string;
           version: string;
         };
 
-        const versionInfo = await bawClient.getVersion(container, version);
+        const versionInfo = await bawClient!.getVersion(container, version);
 
         return {
           content: [
@@ -425,16 +442,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'list_containers': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { offset, size } = args as {
           offset?: number;
           size?: number;
         };
 
-        const result = await bawClient.listContainers(offset, size);
+        const result = await bawClient!.listContainers(offset, size);
 
         return {
           content: [
@@ -451,16 +466,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'activate_version': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { container, version } = args as {
           container: string;
           version: string;
         };
 
-        const result = await bawClient.activateVersion(container, version);
+        const result = await bawClient!.activateVersion(container, version);
 
         return {
           content: [
@@ -477,9 +490,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'deactivate_version': {
-        if (!bawClient) {
-          throw new Error('Not authenticated. Please call baw_login first.');
-        }
+        await ensureAuthenticated();
 
         const { container, version, force, suspendInstances } = args as {
           container: string;
@@ -488,7 +499,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           suspendInstances?: boolean;
         };
 
-        const result = await bawClient.deactivateVersion(container, version, force, suspendInstances);
+        const result = await bawClient!.deactivateVersion(container, version, force, suspendInstances);
 
         return {
           content: [

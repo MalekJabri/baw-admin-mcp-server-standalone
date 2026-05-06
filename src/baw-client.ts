@@ -6,6 +6,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import https from 'https';
 import FormData from 'form-data';
 import fs from 'fs';
+import path from 'path';
 import type {
   BAWConfig,
   CSRFToken,
@@ -156,14 +157,17 @@ export class BAWClient {
 
     const { install_file, inactive, caseDosName, caseProjectArea, caseOverwrite } = request;
 
+    // Normalize path for cross-platform compatibility (handles Windows backslashes)
+    const normalizedPath = path.normalize(install_file);
+
     // Check if file exists
-    if (!fs.existsSync(install_file)) {
-      throw new Error(`Installation file not found: ${install_file}`);
+    if (!fs.existsSync(normalizedPath)) {
+      throw new Error(`Installation file not found: ${normalizedPath}`);
     }
 
     // Create form data
     const formData = new FormData();
-    formData.append('install_file', fs.createReadStream(install_file));
+    formData.append('install_file', fs.createReadStream(normalizedPath));
 
     // Build query parameters
     const params: any = {};

@@ -22,6 +22,33 @@ import type { BAWConfig, InstallRequest } from './types.js';
 // Global BAW client instance
 let bawClient: BAWClient | null = null;
 
+// Auto-login if environment variables are provided
+async function initializeClient(): Promise<void> {
+  const baseUrl = process.env.BAW_BASE_URL || process.env.baseUrl;
+  const username = process.env.BAW_USERNAME || process.env.username;
+  const password = process.env.BAW_PASSWORD || process.env.password;
+  const rejectUnauthorized = process.env.BAW_REJECT_UNAUTHORIZED || process.env.rejectUnauthorized;
+
+  if (baseUrl && username && password) {
+    try {
+      const config: BAWConfig = {
+        baseUrl,
+        username,
+        password,
+        rejectUnauthorized: rejectUnauthorized === 'false' ? false : true
+      };
+
+      bawClient = new BAWClient(config);
+      await bawClient.login(false);
+      console.error('Auto-login successful using environment variables');
+    } catch (error) {
+      console.error('Auto-login failed:', error instanceof Error ? error.message : String(error));
+      console.error('You can still use baw_login tool to authenticate manually');
+      bawClient = null;
+    }
+  }
+}
+
 // Tool definitions
 const TOOLS: Tool[] = [
   {
@@ -488,6 +515,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Start the server
 async function main() {
+  // Initialize client with environment variables if provided
+  await initializeClient();
+  
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('BAW Operations MCP Server running on stdio');

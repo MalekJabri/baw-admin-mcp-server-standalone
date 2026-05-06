@@ -17,11 +17,19 @@ Add this configuration to your MCP client's config file:
         "-y",
         "github:MalekJabri/baw-admin-mcp-server-standalone",
         "baw-admin-mcp-server"
-      ]
+      ],
+      "env": {
+        "BAW_BASE_URL": "https://your-baw-server.com:9443",
+        "BAW_USERNAME": "your_username",
+        "BAW_PASSWORD": "your_password",
+        "BAW_REJECT_UNAUTHORIZED": "false"
+      }
     }
   }
 }
 ```
+
+**Note:** With environment variables configured, the server automatically logs in on startup. You can skip Step 4 below!
 
 **Config file locations:**
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -44,9 +52,11 @@ In your MCP client, you should now see 8 BAW tools available:
 - baw_activate_version
 - baw_deactivate_version
 
-## Step 4: Login to BAW
+## Step 4: Login to BAW (Optional)
 
-Use the `baw_login` tool with your BAW credentials:
+**If you configured environment variables in Step 1, skip this step - you're already authenticated!**
+
+Otherwise, use the `baw_login` tool with your BAW credentials:
 
 ```json
 {

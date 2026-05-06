@@ -42,6 +42,29 @@ This method requires no local installation. The server is downloaded and run aut
 
 Edit your `claude_desktop_config.json`:
 
+**With Auto-Login (Recommended):**
+```json
+{
+  "mcpServers": {
+    "baw-admin": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:MalekJabri/baw-admin-mcp-server-standalone",
+        "baw-admin-mcp-server"
+      ],
+      "env": {
+        "BAW_BASE_URL": "https://your-baw-server.com:9443",
+        "BAW_USERNAME": "your_username",
+        "BAW_PASSWORD": "your_password",
+        "BAW_REJECT_UNAUTHORIZED": "false"
+      }
+    }
+  }
+}
+```
+
+**Without Auto-Login (Manual):**
 ```json
 {
   "mcpServers": {
@@ -57,22 +80,7 @@ Edit your `claude_desktop_config.json`:
 }
 ```
 
-**Configuration for other MCP clients:**
-
-```json
-{
-  "mcpServers": {
-    "baw-admin": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "github:MalekJabri/baw-admin-mcp-server-standalone",
-        "baw-admin-mcp-server"
-      ]
-    }
-  }
-}
-```
+Then use the `baw_login` tool to authenticate.
 
 ### Method 2: Local Installation
 
@@ -202,8 +210,10 @@ Refer to your specific MCP client's documentation for configuration file locatio
 ### Credentials
 
 - Never commit BAW credentials to the repository
-- Credentials are only passed at runtime through tool calls
-- The server does not persist credentials
+- When using environment variables, ensure your MCP client config file is secure
+- Credentials are only passed at runtime (via env vars or tool calls)
+- The server does not persist credentials beyond the session
+- Consider using a secrets manager for production deployments
 
 ## Development Workflow
 

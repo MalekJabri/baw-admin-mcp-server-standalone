@@ -48,6 +48,33 @@ Add this server to your MCP settings file (e.g., `claude_desktop_config.json`):
 
 ### Using npx (from GitHub)
 
+**Option A: With Environment Variables (Recommended)**
+
+```json
+{
+  "mcpServers": {
+    "baw-admin": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:MalekJabri/baw-admin-mcp-server-standalone",
+        "baw-admin-mcp-server"
+      ],
+      "env": {
+        "BAW_BASE_URL": "https://your-baw-server.com:9443",
+        "BAW_USERNAME": "your_username",
+        "BAW_PASSWORD": "your_password",
+        "BAW_REJECT_UNAUTHORIZED": "false"
+      }
+    }
+  }
+}
+```
+
+The server will automatically login using these credentials on startup.
+
+**Option B: Manual Login**
+
 ```json
 {
   "mcpServers": {
@@ -63,6 +90,8 @@ Add this server to your MCP settings file (e.g., `claude_desktop_config.json`):
 }
 ```
 
+Then use the `baw_login` tool to authenticate manually.
+
 ### Using local installation
 
 ```json
@@ -76,11 +105,24 @@ Add this server to your MCP settings file (e.g., `claude_desktop_config.json`):
 }
 ```
 
+## Environment Variables
+
+The server supports automatic authentication using environment variables:
+
+- `BAW_BASE_URL` or `baseUrl`: Base URL of the BAW server
+- `BAW_USERNAME` or `username`: Username for authentication
+- `BAW_PASSWORD` or `password`: Password for authentication
+- `BAW_REJECT_UNAUTHORIZED` or `rejectUnauthorized`: SSL certificate validation (default: "true")
+
+When these variables are provided, the server automatically logs in on startup. If auto-login fails, you can still use the `baw_login` tool manually.
+
 ## Available Tools
 
 ### 1. baw_login
 
 Login to IBM Business Automation Workflow and obtain a CSRF token for subsequent operations.
+
+**Note:** If you configured environment variables, the server is already authenticated and you don't need to call this tool.
 
 **Parameters:**
 - `baseUrl` (required): Base URL of the BAW server (e.g., `https://baw-server.example.com:9443`)

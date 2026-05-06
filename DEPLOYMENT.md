@@ -38,9 +38,9 @@ git push -u origin main
 
 This method requires no local installation. The server is downloaded and run automatically.
 
-**Configuration for Claude Desktop:**
+**Configuration for Bob (IBM):**
 
-Edit your `claude_desktop_config.json`:
+Edit your MCP configuration file:
 
 **With Auto-Login (Recommended):**
 ```json
@@ -155,7 +155,7 @@ npx --version
 ```
 
 **Check the logs:**
-- Claude Desktop: Check `~/Library/Logs/Claude/mcp*.log` (macOS) or equivalent
+- Bob (IBM): Check your MCP client's log location
 - Other clients: Check their respective log locations
 
 ### Connection Issues
@@ -177,12 +177,10 @@ npm run build
 ```
 
 ## Configuration File Locations
+### Bob (IBM) MCP Client
 
-### Claude Desktop
+- Check your Bob configuration documentation for the MCP config file location
 
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
 ### Other MCP Clients
 

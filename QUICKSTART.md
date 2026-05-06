@@ -5,8 +5,8 @@ Get started with the BAW Admin MCP Server in 5 minutes!
 ## Step 1: Configure Your MCP Client
 
 Add this configuration to your MCP client's config file:
+**For Bob (IBM)** MCP configuration:
 
-**For Claude Desktop** (`claude_desktop_config.json`):
 
 ```json
 {
@@ -31,14 +31,12 @@ Add this configuration to your MCP client's config file:
 
 **Note:** With environment variables configured, the server automatically logs in on startup. You can skip Step 4 below!
 
-**Config file locations:**
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-- Linux: `~/.config/Claude/claude_desktop_config.json`
+**Config file location:**
+- Check your Bob (IBM) MCP client documentation for the configuration file location
 
 ## Step 2: Restart Your MCP Client
+Restart Bob (or your MCP client) to load the server.
 
-Restart Claude Desktop (or your MCP client) to load the server.
 
 ## Step 3: Verify Installation
 

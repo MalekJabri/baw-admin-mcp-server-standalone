@@ -1,0 +1,37 @@
+# Source files (only ship compiled code)
+src/
+tsconfig.json
+
+# Development files
+.vscode/
+.idea/
+
+# Documentation (keep in npm package)
+# README.md
+# EXAMPLES.md
+# DEPLOYMENT.md
+
+# Test files
+*.test.ts
+*.spec.ts
+test/
+tests/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reference file
+baw-ops.json
+
+# Made with Bob

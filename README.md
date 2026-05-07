@@ -46,7 +46,7 @@ npm run build
 
 ## Configuration
 
-Add this server to your MCP settings file (e.g., `claude_desktop_config.json`):
+Add this server to your MCP settings file (e.g., `.bob/mcp.json`):
 
 ### Using npx (from GitHub)
 

@@ -1,5 +1,7 @@
 # Quick Start Guide
 
+> **⚠️ DISCLAIMER**: This is **NOT** an official IBM project. This tool is created to accelerate packaging and testing of IBM BAW admin solutions. Not supported or endorsed by IBM.
+
 Get started with the BAW Admin MCP Server in 5 minutes!
 
 ## Step 1: Configure Your MCP Client

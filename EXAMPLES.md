@@ -1,5 +1,7 @@
 # IBM BAW Operations MCP Server - Usage Examples
 
+> **⚠️ DISCLAIMER**: This is **NOT** an official IBM project. This tool is created to accelerate packaging and testing of IBM BAW admin solutions. Not supported or endorsed by IBM.
+
 This document provides practical examples of using the BAW Operations MCP Server.
 
 ## Example 1: Basic Login and Container Installation

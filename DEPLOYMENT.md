@@ -1,5 +1,7 @@
 # Deployment Guide for BAW Admin MCP Server
 
+> **⚠️ DISCLAIMER**: This is **NOT** an official IBM project. This tool is created to accelerate packaging and testing of IBM BAW admin solutions. Not supported or endorsed by IBM.
+
 This guide explains how to deploy and use the BAW Admin MCP Server from GitHub.
 
 ## Prerequisites

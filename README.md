@@ -1,5 +1,7 @@
 # IBM Business Automation Workflow Operations MCP Server
 
+> **⚠️ DISCLAIMER**: This is **NOT** an official IBM GitHub repository or IBM MCP project. This is an independent tool created to accelerate packaging and testing of IBM Business Automation Workflow admin solutions. It is not supported, endorsed, or maintained by IBM.
+
 A Model Context Protocol (MCP) server that provides tools for managing IBM Business Automation Workflow (BAW) operations, including login, container installation, and monitoring.
 
 ## Features

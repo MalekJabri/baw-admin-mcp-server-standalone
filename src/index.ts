@@ -215,6 +215,57 @@ const TOOLS: Tool[] = [
     }
   },
   {
+    name: 'list_versions',
+    description: 'List all snapshots/versions of a specific process application or toolkit. For Workflow Center, only named snapshots are returned.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'string',
+          description: 'The acronym of the process application or toolkit'
+        },
+        versionIds: {
+          type: 'array',
+          items: {
+            type: 'string'
+          },
+          description: 'Comma-separated list of snapshot IDs to filter results (optional)'
+        },
+        branch: {
+          type: 'string',
+          description: 'Track acronym to view only snapshots belonging to that track (optional)'
+        },
+        offset: {
+          type: 'number',
+          description: 'Position of the first snapshot to return from the query result set (optional)'
+        },
+        size: {
+          type: 'number',
+          description: 'Maximum number of snapshots to return (optional)'
+        }
+      },
+      required: ['container']
+    }
+  },
+  {
+    name: 'get_versions_count',
+    description: 'Get the count of all snapshots/versions for a specific process application or toolkit.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'string',
+          description: 'The acronym of the process application or toolkit'
+        },
+        branch: {
+          type: 'string',
+          description: 'Track acronym to count only snapshots belonging to that track (optional)'
+        }
+      },
+      required: ['container']
+    }
+  },
+  {
     name: 'activate_version',
     description: 'Activate a container version/snapshot to make it available for use.',
     inputSchema: {
@@ -520,6 +571,63 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 success: true,
                 containerCount: result.containers.length,
                 containers: result.containers
+              }, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'list_versions': {
+        await ensureAuthenticated();
+
+        const { container, versionIds, branch, offset, size } = args as {
+          container: string;
+          versionIds?: string[];
+          branch?: string;
+          offset?: number;
+          size?: number;
+        };
+
+        const result = await bawClient!.listVersions(container, {
+          versionIds,
+          branch,
+          offset,
+          size
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                versionCount: result.versions.length,
+                versions: result.versions
+              }, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'get_versions_count': {
+        await ensureAuthenticated();
+
+        const { container, branch } = args as {
+          container: string;
+          branch?: string;
+        };
+
+        const result = await bawClient!.getVersionsCount(container, branch);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                count: result.count,
+                container,
+                branch: branch || 'all'
               }, null, 2)
             }
           ]

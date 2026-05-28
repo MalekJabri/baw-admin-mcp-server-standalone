@@ -272,6 +272,57 @@ export class BAWClient {
   }
 
   /**
+   * List all versions/snapshots of a container
+   */
+  async listVersions(
+    container: string,
+    options?: {
+      versionIds?: string[];
+      branch?: string;
+      offset?: number;
+      size?: number;
+    }
+  ): Promise<{ versions: Version[] }> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const params: any = {};
+    if (options?.versionIds && options.versionIds.length > 0) {
+      params.version_ids = options.versionIds.join(',');
+    }
+    if (options?.branch) params.branch = options.branch;
+    if (options?.offset !== undefined) params.offset = options.offset;
+    if (options?.size !== undefined) params.size = options.size;
+
+    const response = await this.axiosInstance.get<{ versions: Version[] }>(
+      `/std/bpm/containers/${container}/versions`,
+      { params }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Get count of versions/snapshots for a container
+   */
+  async getVersionsCount(container: string, branch?: string): Promise<{ count: number }> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const params: any = {};
+    if (branch) params.branch = branch;
+
+    const response = await this.axiosInstance.get<{ count: number }>(
+      `/std/bpm/containers/${container}/versions/count`,
+      { params }
+    );
+
+    return response.data;
+  }
+
+  /**
    * List all containers
    */
   async listContainers(offset?: number, size?: number): Promise<{ containers: Container[] }> {

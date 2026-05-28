@@ -331,6 +331,51 @@ export class BAWClient {
 
     return response.data;
   }
+
+  /**
+   * Delete snapshots of process applications or toolkits
+   * This operation is asynchronous and returns a status URL to monitor progress
+   */
+  async deleteVersions(
+    container: string,
+    options?: {
+      branchName?: string;
+      versions?: string[];
+      force?: boolean;
+      keptNumber?: number;
+      createdBefore?: string;
+      createdAfter?: string;
+      createdBeforeVersion?: string;
+      deleteArchived?: boolean;
+      caseDosName?: string;
+      continueOnError?: boolean;
+    }
+  ): Promise<RequestAcceptedResult> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const params: any = {};
+    if (options?.branchName) params.branch_name = options.branchName;
+    if (options?.versions && options.versions.length > 0) {
+      params.versions = options.versions.join(',');
+    }
+    if (options?.force !== undefined) params.force = options.force;
+    if (options?.keptNumber !== undefined) params.kept_number = options.keptNumber;
+    if (options?.createdBefore) params.created_before = options.createdBefore;
+    if (options?.createdAfter) params.created_after = options.createdAfter;
+    if (options?.createdBeforeVersion) params.created_before_version = options.createdBeforeVersion;
+    if (options?.deleteArchived !== undefined) params.delete_archived = options.deleteArchived;
+    if (options?.caseDosName) params.caseDosName = options.caseDosName;
+    if (options?.continueOnError !== undefined) params.continueOnError = options.continueOnError;
+
+    const response = await this.axiosInstance.delete<RequestAcceptedResult>(
+      `/std/bpm/containers/${container}/versions`,
+      { params }
+    );
+
+    return response.data;
+  }
 }
 
 // Made with Bob

@@ -259,6 +259,66 @@ const TOOLS: Tool[] = [
       },
       required: ['container', 'version']
     }
+  },
+  {
+    name: 'delete_version',
+    description: 'Delete snapshots of process applications or toolkits. This is an asynchronous operation that returns a status URL to monitor progress. WARNING: This is a destructive operation. Only administrators can perform this action. On Workflow Server, delete inactive snapshots without running instances. On Workflow Center, archive named snapshots first, then delete unnamed and archived snapshots when obsolete.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'string',
+          description: 'The acronym of the process application or toolkit'
+        },
+        branchName: {
+          type: 'string',
+          description: 'Workflow Center only: The name of the track associated with the process application or toolkit'
+        },
+        versions: {
+          type: 'array',
+          items: {
+            type: 'string'
+          },
+          description: 'Required for Workflow Server. Optional for Workflow Center. Comma-separated list of snapshot acronyms to delete. If specified on Workflow Center, no other filters can be used.'
+        },
+        force: {
+          type: 'boolean',
+          description: 'Workflow Server only: Set to true to delete the last and default snapshot of a process application (removes the entire app)',
+          default: false
+        },
+        keptNumber: {
+          type: 'number',
+          description: 'Workflow Center only: Number of most recent unnamed snapshots to keep (tip not counted). Cannot be used with created_before/created_after.'
+        },
+        createdBefore: {
+          type: 'string',
+          description: 'Workflow Center only: Delete unnamed snapshots created before this time (ISO 8601 format: yyyy-MM-ddTHH:mm:ss.sssZ)'
+        },
+        createdAfter: {
+          type: 'string',
+          description: 'Workflow Center only: Delete unnamed snapshots created after this time (ISO 8601 format: yyyy-MM-ddTHH:mm:ss.sssZ)'
+        },
+        createdBeforeVersion: {
+          type: 'string',
+          description: 'Workflow Center only: Acronym of a named snapshot. Delete unnamed snapshots created before this snapshot.'
+        },
+        deleteArchived: {
+          type: 'boolean',
+          description: 'Workflow Center only: Set to true to delete archived snapshots and unnamed snapshots matching filter criteria',
+          default: false
+        },
+        caseDosName: {
+          type: 'string',
+          description: 'Workflow Server only: Case design object store name if not using default "dos" (when removing last snapshot)'
+        },
+        continueOnError: {
+          type: 'boolean',
+          description: 'Workflow Server only: Continue processing remaining versions even if an error occurs. Must be used with versions parameter.',
+          default: false
+        }
+      },
+      required: ['container']
+    }
   }
 ];
 
@@ -510,6 +570,64 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 success: true,
                 message: 'Version deactivated successfully',
                 version: result
+              }, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'delete_version': {
+        await ensureAuthenticated();
+
+        const {
+          container,
+          branchName,
+          versions,
+          force,
+          keptNumber,
+          createdBefore,
+          createdAfter,
+          createdBeforeVersion,
+          deleteArchived,
+          caseDosName,
+          continueOnError
+        } = args as {
+          container: string;
+          branchName?: string;
+          versions?: string[];
+          force?: boolean;
+          keptNumber?: number;
+          createdBefore?: string;
+          createdAfter?: string;
+          createdBeforeVersion?: string;
+          deleteArchived?: boolean;
+          caseDosName?: string;
+          continueOnError?: boolean;
+        };
+
+        const result = await bawClient!.deleteVersions(container, {
+          branchName,
+          versions,
+          force,
+          keptNumber,
+          createdBefore,
+          createdAfter,
+          createdBeforeVersion,
+          deleteArchived,
+          caseDosName,
+          continueOnError
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                message: 'Delete request submitted. This is an asynchronous operation. Check system log for progress.',
+                statusUrl: result.status_url,
+                key: result.key,
+                operationId: result.status_url ? result.status_url.split('/').pop() : undefined
               }, null, 2)
             }
           ]

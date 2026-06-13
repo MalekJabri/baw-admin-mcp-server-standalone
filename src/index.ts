@@ -18,6 +18,8 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { BAWClient } from './baw-client.js';
 import type { BAWConfig, InstallRequest } from './types.js';
+import fs from 'fs';
+import path from 'path';
 
 // Global BAW client instance
 let bawClient: BAWClient | null = null;
@@ -309,6 +311,64 @@ const TOOLS: Tool[] = [
         }
       },
       required: ['container', 'version']
+    }
+  },
+  {
+    name: 'export_version',
+    description: 'Export a container version/snapshot as a TWX file. This downloads the process application or toolkit snapshot that can be imported into another Workflow Center server. The file will be saved to the specified output path. Only administrators or users with project read permission can perform this action.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'string',
+          description: 'The acronym of the process application or toolkit'
+        },
+        version: {
+          type: 'string',
+          description: 'The acronym of the snapshot to export'
+        },
+        outputPath: {
+          type: 'string',
+          description: 'Path where the exported TWX file should be saved (e.g., ./exports/myapp.twx)'
+        },
+        format: {
+          type: 'string',
+          enum: ['twxWithoutToolkits'],
+          description: 'Export format. Use "twxWithoutToolkits" to skip exporting system toolkits that are not versioned (optional)'
+        },
+        useEnhancedFilenames: {
+          type: 'boolean',
+          description: 'Set to true to produce more meaningful file names within the exported file (default: false)',
+          default: false
+        }
+      },
+      required: ['container', 'version', 'outputPath']
+    }
+  },
+  {
+    name: 'create_version',
+    description: 'Create a new snapshot of a process application or toolkit on Workflow Center. This creates a named snapshot that can be installed to workflow servers. Only administrators or users with project write permission can perform this action.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'string',
+          description: 'The acronym of the process application or toolkit'
+        },
+        versionName: {
+          type: 'string',
+          description: 'The name of the snapshot (can include A-Z, 0-9, _)'
+        },
+        branchAcronym: {
+          type: 'string',
+          description: 'The acronym of the track/branch (optional, uses default track if not specified)'
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the new snapshot (optional)'
+        }
+      },
+      required: ['container', 'versionName']
     }
   },
   {
@@ -677,6 +737,78 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               text: JSON.stringify({
                 success: true,
                 message: 'Version deactivated successfully',
+                version: result
+              }, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'export_version': {
+        await ensureAuthenticated();
+
+        const { container, version, outputPath, format, useEnhancedFilenames } = args as {
+          container: string;
+          version: string;
+          outputPath: string;
+          format?: 'twxWithoutToolkits';
+          useEnhancedFilenames?: boolean;
+        };
+
+        // Export the version
+        const buffer = await bawClient!.exportVersion(container, version, {
+          format,
+          useEnhancedFilenames
+        });
+
+        // Ensure output directory exists
+        const outputDir = path.dirname(outputPath);
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        // Write the file
+        fs.writeFileSync(outputPath, buffer);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                message: 'Version exported successfully',
+                outputPath,
+                fileSize: buffer.length,
+                container,
+                version
+              }, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'create_version': {
+        await ensureAuthenticated();
+
+        const { container, versionName, branchAcronym, description } = args as {
+          container: string;
+          versionName: string;
+          branchAcronym?: string;
+          description?: string;
+        };
+
+        const result = await bawClient!.createVersion(container, versionName, {
+          branchAcronym,
+          description
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                message: 'Snapshot created successfully',
                 version: result
               }, null, 2)
             }

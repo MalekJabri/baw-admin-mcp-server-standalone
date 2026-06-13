@@ -46,6 +46,20 @@ export interface MigrationInstruction {
   target_snapshot_id: string;
 }
 
+export interface ExportVersionRequest {
+  container: string;
+  version: string;
+  format?: 'twxWithoutToolkits';
+  useEnhancedFilenames?: boolean;
+}
+
+export interface CreateVersionRequest {
+  container: string;
+  versionName: string;
+  branchAcronym?: string;
+  description?: string;
+}
+
 export interface RequestAcceptedResult {
   status_url: string;
   key?: string;

@@ -304,6 +304,72 @@ export class BAWClient {
   }
 
   /**
+   * Export a container version as a TWX file
+   */
+  async exportVersion(
+    container: string,
+    version: string,
+    options?: {
+      format?: 'twxWithoutToolkits';
+      useEnhancedFilenames?: boolean;
+    }
+  ): Promise<Buffer> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const params: any = {};
+    if (options?.format) params.format = options.format;
+    if (options?.useEnhancedFilenames !== undefined) {
+      params.use_enhanced_filenames = options.useEnhancedFilenames;
+    }
+
+    const response = await this.axiosInstance.get(
+      `/std/bpm/containers/${container}/versions/${version}/export`,
+      {
+        params,
+        responseType: 'arraybuffer'
+      }
+    );
+
+    return Buffer.from(response.data);
+  }
+
+  /**
+   * Create a new snapshot of a process application or toolkit
+   */
+  async createVersion(
+    container: string,
+    versionName: string,
+    options?: {
+      branchAcronym?: string;
+      description?: string;
+    }
+  ): Promise<Version> {
+    if (!this.isAuthenticated()) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+
+    const body: any = {
+      version_name: versionName
+    };
+
+    if (options?.branchAcronym) {
+      body.branch_acronym = options.branchAcronym;
+    }
+    if (options?.description) {
+      body.description = options.description;
+    }
+
+    const response = await this.axiosInstance.post<Version>(
+      `/std/bpm/containers/${container}/versions`,
+      body
+    );
+
+    return response.data;
+  }
+
+  /**
    * Get count of versions/snapshots for a container
    */
   async getVersionsCount(container: string, branch?: string): Promise<{ count: number }> {

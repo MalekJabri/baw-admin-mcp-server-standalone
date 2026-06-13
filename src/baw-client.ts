@@ -328,7 +328,11 @@ export class BAWClient {
       `/std/bpm/containers/${container}/versions/${version}/export`,
       {
         params,
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
+        headers: {
+          'Accept': 'application/octet-stream',
+          'BPMCSRFToken': this.csrfToken
+        }
       }
     );
 
